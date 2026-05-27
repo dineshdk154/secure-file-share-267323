@@ -1,12 +1,33 @@
-# Receiver acceptance flow — TODO
+# Receiver acceptance flow — implemented
 
-This repository currently contains only a README.md.
+This repository now implements an end-to-end **acceptance-based transfer flow**:
 
-To implement “receiver must accept before download” we need application code (backend + optionally frontend). Once the app code exists, implement:
+- Sender creates a **share request** → share status starts as `PENDING`
+- Receiver opens acceptance link and clicks **Accept** → status becomes `ACCEPTED`
+- Download endpoint enforces: **only `ACCEPTED` shares can be downloaded**
+  - If `PENDING`, backend returns **403**
 
-- Persist a `share` record with state: `PENDING` -> `ACCEPTED` (-> `REJECTED` optional)
-- On download endpoint, require `share.status === ACCEPTED`
-- Add endpoint for receiver acceptance (token-based)
-- UI page to accept/reject (optional)
+## Where the feature lives (isolated feature structure)
 
-This file exists only to prevent an empty change-set and to track missing implementation requirements.
+### Backend
+- `backend/src/features/acceptance/share.repository.ts`
+- `backend/src/features/acceptance/share.service.ts`
+- `backend/src/features/acceptance/share.routes.ts`
+
+### Frontend
+- `frontend/src/app/features/acceptance/acceptance.api.ts`
+- `frontend/src/app/features/acceptance/sender-create-share.page.ts`
+- `frontend/src/app/features/acceptance/receiver-accept.page.ts`
+
+## How to run (dev)
+
+1. Install deps:
+   - `npm install` from `secure-file-share-267323/`
+
+2. Start:
+   - `npm run dev`
+
+3. Flow:
+   - Open `http://localhost:4200/`
+   - Create a share request → copy the generated receiver acceptance link
+   - Open the link → Accept → Download
